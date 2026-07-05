@@ -1,0 +1,67 @@
+import axios from "axios";
+import { useEffect, useState } from "react";
+
+export default function App() {
+	const [todos, setTodos] = useState({
+		data: [],
+		loading: true,
+		error: null,
+	});
+
+	async function getTodos() {
+		const resp = axios.get();
+	}
+
+	async function fetchTodos() {
+		try {
+			const resp = await fetch(
+				"https://react-api-integration-todo-apps-be.vercel.app/todos",
+				{ method: "GET" },
+			);
+			if (resp.ok && resp.status == 200) {
+				const respData = await resp.json();
+				setTodos({ data: respData, loading: false, error: null });
+			} else {
+				console.log("Fetch unsuccessful");
+			}
+		} catch (error) {
+			console.log(error);
+		}
+	}
+
+	function showTodo(todo) {
+		console.log("showing todo");
+		let style =
+			"bg-gray-500 flex flex-col gap border-2 rounded-xl px-8 py-2 text-center";
+		if (todo.is_completed == "true") {
+			style += " border-green-300";
+		} else {
+			style += " border-red-300";
+		}
+		return (
+			<div key={todo.id} className={style}>
+				<p className="text-xl font-semibold">{todo.title.toUpperCase()}</p>
+				<p>{todo.description}</p>
+			</div>
+		);
+	}
+
+	useEffect(() => {
+		if (todos.loading) {
+			fetchTodos();
+		}
+	});
+
+	return (
+		<>
+			<main className="p-8 flex flex-col gap-2">
+				<h1 className="font-black text-2xl text-center">My Todos</h1>
+				{todos.loading ? (
+					<h2>Fetching data...</h2>
+				) : (
+					<div className="flex flex-col gap-2">{todos.data.map(showTodo)}</div>
+				)}
+			</main>
+		</>
+	);
+}
